@@ -1,6 +1,3 @@
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
-# %%
 import os 
 from torch.utils.data import DataLoader, Dataset
 from PIL import Image
@@ -8,9 +5,9 @@ from PIL import Image
 import torch
 from torch import nn
 from torch.nn import functional as F
+import time
 
 
-# %%
 class Loader(Dataset):
     def __init__(self, split, trasform = None):
         base_dir='./datasets/'
@@ -37,7 +34,6 @@ class Loader(Dataset):
         return image, self.targets[idx]
 
 
-# %%
 from torchvision import transforms
 
 transform = transforms.Compose([
@@ -47,7 +43,6 @@ transform = transforms.Compose([
 ])
 
 
-# %%
 trainSet = Loader('train_signs',transform)
 trainLoader = DataLoader(trainSet, batch_size=2)
 
@@ -60,7 +55,6 @@ testLoader = DataLoader(testSet, batch_size=35)
 dataLoader = {'train':trainLoader,'val':valLoader,'test':testLoader}
 
 
-# %%
 class Net(nn.Module):
     def __init__(self):
         super(Net,self).__init__()
@@ -85,16 +79,13 @@ class Net(nn.Module):
         return x
 
 
-# %%
 device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-# %%
 net = Net()
 net.to(device)
 
 
-# %%
 from torch import optim 
 
 loss_fn = nn.NLLLoss()
@@ -102,11 +93,9 @@ loss_fn = nn.NLLLoss()
 optimizer = optim.Adam(net.parameters(),lr=0.001)
 
 
-# %%
-epocs = 100
+epocs = 1
 
-
-# %%
+start = time.time()
 for epoch in range(epocs):
     
 
@@ -127,32 +116,16 @@ for epoch in range(epocs):
 
         print('loss: ',loss.item(),'      epoc: ',epoch)
 
+stop = time.time()
+Etime = start-stop 
+print('execution time: ',Etime)
+torch.save(net.state_dict(),'model.pth')
+
 
 
 
         
 
 
-
-
-# %%
-valSet = Loader('val_signs',transform)
-image , label = valSet2[20]
-image = image.unsqueeze(0)
-image = torch.tensor(image,dtype=torch.float32)
-image = image.to(device)
-
-
-# %%
-label
-
-
-# %%
-net = net.eval()
-out = net(image)
-out
-
-
-# %%
 
 
